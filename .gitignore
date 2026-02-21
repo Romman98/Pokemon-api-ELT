@@ -3,7 +3,7 @@ __pycache__/*
 data/*
 playground
 .env
-logs/
+logs/*
 dags/datawarehhouse/__pycache__/*
 playground
 postgres.py
