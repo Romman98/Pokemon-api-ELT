@@ -7,8 +7,9 @@ from airflow.decorators import task # pyright: ignore
 # PokeID:
 # Name
 # Type
+# Stro
+#  ng Against
 # Weakness
-# Strong Against
 # Gen
 # Evolves To
 # Evolves From
@@ -35,8 +36,8 @@ def get_pokemon(gen):
         output = response.json()
         path = f"./data/raw/pokemon/gen_{gen}/"
 
-        if not os.path.exists(f"./data/raw/pokemon/gen_{gen}/"):
-              os.mkdir(f"./data/raw/pokemon/gen_{gen}/")            
+        if not os.path.exists(path):
+              os.makedirs(path,exist_ok=True)            
             
         with open(f"{path}/poke_data_{pokemon[1]}.json","w",encoding="utf-8") as json_outfile:
             json.dump(output, json_outfile,indent=2,ensure_ascii=False)
@@ -46,7 +47,10 @@ def get_gen(id):
     url = f"https://pokeapi.co/api/v2/generation/{id}"
     response = requests.get(url)
     output = response.json()
-    path = f"./data/raw/gen/"
+    path = f"./data/raw/gen"
+    
+    if not os.path.exists(path):
+        os.mkdir(path)
     
     with open(f"{path}/gen_data_{id}.json","w",encoding="utf-8") as json_outfile:
         json.dump(output, json_outfile,indent=2,ensure_ascii=False)
@@ -78,7 +82,7 @@ def get_evo(gen):
         output = response.json()
         path = f"./data/raw/evolution/gen_{gen}"
         if not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path, exist_ok=True)
         path_raw = f"{path}/evo_data_{chain}.json"
         
         with open(path_raw,"w",encoding="utf-8") as json_outfile:
@@ -110,7 +114,7 @@ def process_evo():
             if evo2_check:
                 evo3 = evo2_check[0].get("evolves_to",{}).get("name",{})    
         
-        evolution_list[id]=[evo1,evo2,evo3]
+        evolution_list[id]=[chain,evo1,evo2,evo3]
         path_processed = f"./data/processed/evolution/evo_data_{id}.json"
         with open(path_processed,"w",encoding="utf-8") as json_outfile:
             json.dump(evolution_list, json_outfile,indent=2,ensure_ascii=False)
@@ -128,7 +132,7 @@ def get_types():
         path = f"./data/raw/type"
         file = f"{path}/type_{name}.json"
         if not os.path.exists(path):
-            os.mkdir(path)
+            os.makedirs(path, exist_ok=True)
         
         with open(file,"w",encoding="utf-8") as json_outfile:
             json.dump(output,json_outfile,indent=2,ensure_ascii=False)
