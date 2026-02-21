@@ -5,3 +5,5 @@ playground
 .env
 logs/
 dags/datawarehhouse/__pycache__/*
+playground
+postgres.py

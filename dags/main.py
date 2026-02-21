@@ -21,7 +21,7 @@ default_args = {
 }
 
 with DAG (
-    dag_id = 'produce_json',
+    dag_id = 'Produce_JSON',
     default_args=default_args,
     description = "Extracts PokeAPI and produces .JSON files",
     schedule="0 9 * * *",
