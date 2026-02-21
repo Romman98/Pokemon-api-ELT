@@ -3,7 +3,7 @@ import pendulum # pyright: ignore
 from datetime import datetime, timedelta
 from api.poke_api import get_gen, get_pokemon, get_evo, get_types
 from datawarehhouse.dwh import insert_data_pokemon, insert_data_evolution, insert_into_types 
-
+from datawarehhouse.transformation import transformation
 local_tz = pendulum.timezone("Asia/Amman")
 generation = 3
 default_args = {
@@ -40,9 +40,20 @@ with DAG (
     description = "Processes JSON Files and loads them into the DB",
     schedule="0 10 * * *",
     catchup=False,
-) as dag_produce:
+) as dag_process:
     Pokemon = insert_data_pokemon()
     Evolution = insert_data_evolution()
     Types = insert_into_types()
     
     Pokemon >> Evolution >> Types # type: ignore
+
+with DAG (
+    dag_id = 'Tranform_Data',
+    default_args=default_args,
+    description = "Trasnform data from the DB",
+    schedule="0 11 * * *",
+    catchup=False,
+) as dag_transform:
+    Transformation = transformation()
+    
+    Transformation

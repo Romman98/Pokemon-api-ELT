@@ -9,6 +9,8 @@ logger = logging.getLogger(__name__)
 
 create_schema("processing")
 create_table("processing")
+create_schema("transform")
+create_table("transform")
 
 def file_opener(path):
     with open(path,'r',encoding="utf-8") as raw_data:
@@ -52,7 +54,64 @@ def insert_into_tables(schema,table,data):
             
             
     elif schema == "transform":
-        print()
+        cur.execute("""INSERT INTO transform.pokemon_data (
+    "PokeID",
+    "Name",
+    "Gen",
+    "Type",
+    "Base",
+    "NextEvolution",
+    "StrongAgainst",
+    "WeakAgainst"
+)
+SELECT
+    p."PokeID",
+    p."Name",
+    p."Gen",
+    p."Type",
+    e."Base",
+
+    CASE
+        WHEN p."Name" = e."Base" THEN e."First_Evolution"
+        WHEN p."Name" = e."First_Evolution" THEN e."Second_Evolution"
+        ELSE NULL
+    END AS "NextEvolution",
+
+    tf."StrongAgainst",
+    tf."WeakAgainst"
+
+FROM processing.pokemon p
+
+LEFT JOIN processing.evolution e
+    ON p."Name" = e."Base"
+    OR p."Name" = e."First_Evolution"
+    OR p."Name" = e."Second_Evolution"
+
+LEFT JOIN (
+    SELECT
+        t."Type",
+
+        (
+            SELECT jsonb_agg(DISTINCT value)
+            FROM (
+                SELECT jsonb_array_elements(t."Double_Damage_To") AS value
+                UNION
+                SELECT jsonb_array_elements(t."Half_Damage_From")
+            ) s
+        ) AS "StrongAgainst",
+
+        (
+            SELECT jsonb_agg(DISTINCT value)
+            FROM (
+                SELECT jsonb_array_elements(t."Double_Damage_From") AS value
+                UNION
+                SELECT jsonb_array_elements(t."Half_Damage_To")
+            ) s
+        ) AS "WeakAgainst"
+
+    FROM processing.type t
+) tf
+ON p."Type" = tf."Type";""")
     
     close_conn_cursor(conn, cur)
 

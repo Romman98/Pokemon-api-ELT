@@ -38,7 +38,6 @@ def create_table(schema):
         evolution_table_sql = f"""
                 CREATE TABLE IF NOT EXISTS {schema}.evolution (
                     "EvoID" VARCHAR(5) PRIMARY KEY NOT NULL,
-                    "Chain" VARCHAR(5),
                     "Base" VARCHAR(50),
                     "First_Evolution" VARCHAR(50),
                     "Second_Evolution" VARCHAR(50)
@@ -52,11 +51,24 @@ def create_table(schema):
                     "Half_Damage_From" JSONB,
                     "Half_Damage_To" JSONB
                 );
-            """         
+            """
+        cur.execute(evolution_table_sql)
+        cur.execute(type_table_sql)
+    elif schema == "transform":
+        pokemon_table_sql = f"""
+            CREATE TABLE IF NOT EXISTS transform.pokemon_data (
+                "PokeID" VARCHAR(4) PRIMARY KEY NOT NULL,
+                "Name" TEXT NOT NULL,
+                "Gen" VARCHAR(2),
+                "Type" VARCHAR(20),
+                "Base" VARCHAR(50),
+                "NextEvolution" TEXT,
+                "StrongAgainst" JSONB,
+                "WeakAgainst" JSONB
+            );
+        """         
 
     cur.execute(pokemon_table_sql)
-    cur.execute(evolution_table_sql)
-    cur.execute(type_table_sql)
 
     conn.commit()
 

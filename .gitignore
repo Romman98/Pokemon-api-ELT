@@ -4,4 +4,4 @@ data/*
 playground
 .env
 logs/
-dags/datawarehouse/__pycache__/*
+dags/datawarehhouse/__pycache__/*
